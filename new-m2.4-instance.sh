@@ -15,7 +15,7 @@
 
 # system
 comm_num_params="$#"
-source "$PWD/.variables"
+source "$PWD/variables"
 
 # get devilbox and its www projects dir
 
@@ -255,25 +255,92 @@ function replaces_env {
     ## disable php modules
     service="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole"
     service_search="$service"
-    service_replace="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole,psr"
+    service_replace="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole,psr" # remove psr: conflicts because of a bug
     sed -i "s/$service_search/$service_replace/" $_file
 
     echo "-- $service"
 }
 replaces_env
 
-# change_version_elasticsearch
+# additional containers
+function enable_additional_containers {
+    _file_name="docker-compose.override.yml"
+    _file_path="$dbox_dir/$_file_name"
+
+    # TODO delete rm line
+    rm $_file_path
+
+    if [ -f "$_file_path" ]; then
+        echo "Error: $_file_path already exists! Delete it first"
+        exit 1
+    fi
+
+    cp "to_copy/$_file_name" "$_file_path"
+    chown -R $MYUSER:$MYUSER $_file_path
+
+    echo "-- $_file_path created"
+}
+enable_additional_containers
+
+# customize php.ini settings
+function customize_php_ini {
+    _file_name="custom.ini"
+    _file_path="$dbox_dir/cfg/php-ini-7.4/$_file_name"
+
+    # TODO delete rm line
+    rm $_file_path
+
+    if [ -f "$_file_path" ]; then
+        echo "Error: $_file_path already exists! Delete it first"
+        exit 1
+    fi
+
+    cp "to_copy/$_file_name" "$_file_path"
+    chown -R $MYUSER:$MYUSER $_file_path
+
+    echo "-- $_file_path created"
+}
+customize_php_ini
 
 
-# composer-v1 (/usr/local/bin/comoser-1)
+# create start devilbox script: httpd, php, mysql, mailhog, elasitcsearch
+function create_start_dbox_script {
+    _file_name="_start.sh"
+    _file_path="$dbox_dir/$_file_name"
+
+    # TODO delete rm line
+    rm $_file_path
+
+    if [ -f "$_file_path" ]; then
+        echo "Error: $_file_path already exists! Delete it first"
+        exit 1
+    fi
+
+    cp "to_copy/$_file_name" "$_file_path"
+    chown -R $MYUSER:$MYUSER $_file_path
+    chmod +x $_file_path
+
+    echo "-- $_file_path created"
+}
+create_start_dbox_script
+
+# prepare install scripts inside container
 
 
-# new php.ini settings
 
-# remove php module that conflicts: psr
-# https://devilbox.readthedocs.io/en/latest/intermediate/enable-disable-php-modules.html#disable-php-modules
 
-# run containers: httpd, php, mysql, mailhog, elasitcsearch
+
+##
+##
+##
+## Start devilbox and enter php container
+##
+##
+##
+
+# start devilbox
+
+# composer-v1 (/usr/local/bin/comoser-1) /usr/local/bin/composer-1 y si quieres meterlo como symlink en /usr/local/bin
 
 # create mysql database and grant access
 
