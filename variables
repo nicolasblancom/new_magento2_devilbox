@@ -1,3 +1,0 @@
-MYUSER="nicolasblancom"
-MYSUSER_CHOWN=$MYUSER
-MYUSER_HOME_DIR="/home/$MYUSER"
