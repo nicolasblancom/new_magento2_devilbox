@@ -215,3 +215,6 @@ function create_start_dbox_script {
     echo "    -- $_file_path created"
 }
 
+function create_install_script {
+    echo "create install script"
+}
