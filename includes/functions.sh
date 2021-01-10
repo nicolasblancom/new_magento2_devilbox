@@ -34,7 +34,7 @@ function create_project_dir {
         mkdir -p "$_project_dir/htdocs"
         chown -R $MYUSER:$MYUSER $_project_dir
         
-        echo "-- $_project_dir created"
+        echo "    -- $_project_dir created"
 
         return 0
     fi
@@ -59,13 +59,13 @@ function create_local_hosts_entry {
         echo "'$_entry' already found $_entry_counter times!!"
     else
         echo $_entry >> "/etc/hosts"
-        echo "-- '$_entry' updated in hosts file"
+        echo "    -- '$_entry' updated in hosts file"
     fi
 }
 
 function create_new_env_file {
     # TODO remove rm statement
-        rm "$dbox_dir/.env"
+        rm "$dbox_dir/.env" > /dev/null 2>&1
 
     if [ -f "$dbox_dir/.env" ]; then
         echo "Error: .env file already exists!! Delete ir first"
@@ -75,7 +75,7 @@ function create_new_env_file {
     cp "$dbox_env_file" "$dbox_dir/.env"
     chown -R $MYUSER:$MYUSER "$dbox_dir/.env"
 
-    echo "-- new .env file created"
+    echo "    -- new .env file created"
 }
 
 function replaces_env {
@@ -102,7 +102,7 @@ function replaces_env {
     service_replace="$service"
     sed -i "s/$service_search/$service_replace/" $_file
 
-    echo "-- $service"
+    echo "    -- $service"
 
     ## database engine
     # disable mariadb
@@ -117,7 +117,7 @@ function replaces_env {
     service_replace="$service"
     sed -i "s/$service_search/$service_replace/" $_file
     
-    echo "-- $service"
+    echo "    -- $service"
 
     ## redis
     # disable redis_6
@@ -142,7 +142,7 @@ function replaces_env {
     service_replace="#$service"
     sed -i "s/$service_search/$service_replace/" $_file
     
-    echo "-- $service"
+    echo "    -- $service"
 
     ## local fylesystem
     # change local project dir 
@@ -157,7 +157,7 @@ function replaces_env {
     service_replace="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole,psr" # remove psr: conflicts because of a bug
     sed -i "s/$service_search/$service_replace/" $_file
 
-    echo "-- $service"
+    echo "    -- $service"
 }
 
 function enable_additional_containers {
@@ -165,7 +165,7 @@ function enable_additional_containers {
     _file_path="$dbox_dir/$_file_name"
 
     # TODO delete rm line
-    rm $_file_path
+    rm $_file_path > /dev/null 2>&1
 
     if [ -f "$_file_path" ]; then
         echo "Error: $_file_path already exists! Delete it first"
@@ -175,7 +175,7 @@ function enable_additional_containers {
     cp "to_copy/$_file_name" "$_file_path"
     chown -R $MYUSER:$MYUSER $_file_path
 
-    echo "-- $_file_path created"
+    echo "    -- $_file_path created"
 }
 
 function customize_php_ini {
@@ -183,7 +183,7 @@ function customize_php_ini {
     _file_path="$dbox_dir/cfg/php-ini-7.4/$_file_name"
 
     # TODO delete rm line
-    rm $_file_path
+    rm $_file_path > /dev/null 2>&1
 
     if [ -f "$_file_path" ]; then
         echo "Error: $_file_path already exists! Delete it first"
@@ -193,7 +193,7 @@ function customize_php_ini {
     cp "to_copy/$_file_name" "$_file_path"
     chown -R $MYUSER:$MYUSER $_file_path
 
-    echo "-- $_file_path created"
+    echo "    -- $_file_path created"
 }
 
 function create_start_dbox_script {
@@ -201,7 +201,7 @@ function create_start_dbox_script {
     _file_path="$dbox_dir/$_file_name"
 
     # TODO delete rm line
-    rm $_file_path
+    rm $_file_path > /dev/null 2>&1
 
     if [ -f "$_file_path" ]; then
         echo "Error: $_file_path already exists! Delete it first"
@@ -212,6 +212,6 @@ function create_start_dbox_script {
     chown -R $MYUSER:$MYUSER $_file_path
     chmod +x $_file_path
 
-    echo "-- $_file_path created"
+    echo "    -- $_file_path created"
 }
 

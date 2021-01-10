@@ -5,7 +5,6 @@
 ## and prepares a local enviroment for it in Devilbox
 ##
 
-
 ##
 ## NOTAS:
 ##
@@ -19,15 +18,7 @@
 ## en el primer caso, me meto en el contenedor php y ejecuto ademas el install script
 ##
 
-##
-##
-##
-## Variables
-##
-##
-##
-
-# system
+# includes
 source "$PWD/includes/variables.sh"
 source "$PWD/includes/functions.sh"
 
@@ -35,47 +26,12 @@ source "$PWD/includes/functions.sh"
 # TODO set variables for the replaces_env function 
 # (when devilbox updates, we need to set what to service enabled by default to disable)
 
+# TODO set a php version variable, so when copying custom.ini we cane
+# refference the correct directory
 
-
-
-
-
-##
-##
-##
-## Print help and check command line arguments
-##
-##
-##
-
-helpFunction()
-{
-   echo ""
-   echo "Usage: $0 -p project_name -b parameterB"
-   echo -e "\t-p Description of what is project_name"
-   echo -e "\t-b Description of what is parameterB"
-   exit 1
-}
-
-while getopts "p:b:" opt
-do
-    case "$opt" in
-        p ) project_name="$OPTARG" ;;
-        b ) parameterB="$OPTARG" ;;
-        ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
-    esac
-done
-
-# Print helpFunction in case parameters are empty
-if [ -z "$project_name" ] || [ -z "$parameterB" ]
-then
-   echo "Some or all of the parameters are empty";
-   helpFunction
-fi
-
-
-
-
+# TODO create magento_loca_switch as entry point, ask for magento version so
+# we can execute that <version>/magento<version>_local_switch.sh. In <version> dir
+# we can have packed all files to copy and this specific version variables (as php version)
 
 ##
 ##
@@ -85,7 +41,7 @@ fi
 ##
 ##
 
-# echo "01 ---> checking deviblox enviroment...";
+echo "01 ---> checking deviblox enviroment...";
 
 check_dbox_dir
 
@@ -105,10 +61,8 @@ check_dbox_env_file
 ##
 ##
 
+echo "02 ---> creating needing directories and config files...";
 
-create_project_dir
-
-create_local_hosts_entry
 
 create_new_env_file
 
@@ -123,8 +77,6 @@ customize_php_ini
 
 # create start devilbox script: httpd, php, mysql, mailhog, elasitcsearch
 create_start_dbox_script
-
-# prepare install scripts inside container
 
 
 
