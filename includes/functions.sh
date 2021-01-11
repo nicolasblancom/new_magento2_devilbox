@@ -37,42 +37,8 @@ function check_dbox {
     check_dbox_env_file
 }
 
-function create_project_dir {
-    _project_dir="$dbox_www_dir/$project_name"
 
-    if [ ! -d "$_project_dir" ]; then
-        mkdir -p "$_project_dir/htdocs"
-        chown -R $MYUSER:$MYUSER $_project_dir
-        
-        echo "    -- $_project_dir created"
-
-        return 0
-    fi
-
-    echo "Error: $_project_dir already exists! Delete it first"
-}
-
-function create_local_hosts_entry {
-    _input="/etc/hosts"
-    _entry="127.0.0.1 $project_name.loc"
-    _entry_counter=0
-
-    # find that entry in the hosts file, returns > 0 if found
-    while IFS= read -r line
-    do
-        if [ "$line" = "$_entry" ]; then
-            ((_entry_counter++))
-        fi
-    done < "$_input"
-
-    if ((_entry_counter > 0)); then
-        echo "'$_entry' already found $_entry_counter times!!"
-    else
-        echo $_entry >> "/etc/hosts"
-        echo "    -- '$_entry' updated in hosts file"
-    fi
-}
-
+## creates .env file from env-example
 function create_new_env_file {
     # TODO remove rm statement
         rm "$dbox_dir/.env" > /dev/null 2>&1
@@ -88,8 +54,10 @@ function create_new_env_file {
     echo "    -- new .env file created"
 }
 
+## .env replace to enable line
 function replaces_env_enable {
     service="$1"
+
     service_search="#$service"
     service_replace="$service"
     sed -i "s/$service_search/$service_replace/" $_file
@@ -97,8 +65,10 @@ function replaces_env_enable {
     echo "    ++ $service enabled"
 }
 
+## .env replace to disable line
 function replaces_env_disable {
     service=$1
+    
     service_search="$service"
     service_replace="#$service"
     sed -i "s/$service_search/$service_replace/" $_file
@@ -106,6 +76,19 @@ function replaces_env_disable {
     echo "    -- $service disabled"
 }
 
+## .env base fylesystem replace
+function replaces_env_fylesystem {
+    # change local project dir 
+    line='HOST_PATH_HTTPD_DATADIR\=\.\/data\/www'
+    line_search=$line
+    line_replace='HOST_PATH_HTTPD_DATADIR\=\.\.\/www-projects'
+
+    sed -i "s/$line_search/$line_replace/" $_file
+
+    echo "    -- HOST_PATH_HTTPD_DATADIR\=\.\.\/www-projects"
+}
+
+## .env replaces for specific magento 2.4.1 version
 function replaces_env_2_4_1 {
     ## php
     # php 7_4 already enabled by default
@@ -137,21 +120,19 @@ function replaces_env_2_4_1 {
     replaces_env_disable "REDIS_SERVER=5.0-alpine"
 
     ## local fylesystem
-    # change local project dir 
-    service='HOST_PATH_HTTPD_DATADIR\=\.\/data\/www'
-    service_search=$service
-    service_replace='HOST_PATH_HTTPD_DATADIR\=\.\.\/www-projects'
-    sed -i "s/$service_search/$service_replace/" $_file
+    replaces_env_fylesystem
     
     ## disable php modules
-    service="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole"
-    service_search="$service"
-    service_replace="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole,psr" # remove psr: conflicts because of a bug
-    sed -i "s/$service_search/$service_replace/" $_file
+    php_mods="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole"
+    php_mods_search="$php_mods"
+    php_mods_replace="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole,psr" # remove psr: conflicts because of a bug
+    sed -i "s/$php_mods_search/$php_mods_replace/" $_file
 
-    echo "    -- $service"
+    echo "    -- $php_mods php modules disabled"
 }
 
+## makes necessary .env replaces depending on magento version
+## params   $1: magento version string
 function replaces_env {
     _file="$dbox_dir/.env"
     
@@ -166,6 +147,10 @@ function replaces_env {
     esac
 }
 
+## creates docker-compose.override.yml to enable additional containers in devilbox
+## parameters:  $1 magento version string
+##              $dbox_www_dir devilbox projects dir path
+##              $project_name string asked to the user
 function enable_additional_containers {
     if [ $# -eq 0 ]; then
         echo "Error ${FUNCNAME[0]}: you must provide a magento version parameter"
@@ -191,6 +176,8 @@ function enable_additional_containers {
     echo "    -- $_file_path created"
 }
 
+## customizes php.ini by createing custom.ini inside devilbox config php files
+## parameters:  $1 magento version string
 function customize_php_ini {
     if [ $# -eq 0 ]; then
         echo "Error ${FUNCNAME[0]}: you must provide a magento version parameter"
@@ -221,6 +208,8 @@ function customize_php_ini {
     echo "    -- $_file_path created"
 }
 
+## creates a _start.sh script to run devilbox with these customized settings
+## parameters:  $1 magento version string
 function create_start_dbox_script {
     if [ $# -eq 0 ]; then
         echo "Error ${FUNCNAME[0]}: you must provide a magento version parameter"

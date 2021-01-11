@@ -1,20 +1,10 @@
 #! /bin/bash
 
+## 
+## This script prepares Devilbox enviroment for a particular magento version
 ##
 ## $magento_version: string     magento version to install or config devilbox to
-##
-
-##
-## NOTAS:
-##
-## caso 01) crear nuevo magento 2.4 (lo hace todo) 
-##          -> magento2.4_local_switch.sh
-## caso 02) adaptar entorno devilbox a magento 2.4 con proyecto existente 
-##              -> magento2.4_local_create.sh
-##              (no crea proj dir, no crea entrada hosts, no crea install script)
-##
-## en ambos casos, ejecutare ./_start.sh
-## en el primer caso, me meto en el contenedor php y ejecuto ademas el install script
+## in help_function you can see required parameters
 ##
 
 # includes
@@ -45,16 +35,6 @@ if [ -z "$magento_version" ]; then
    helpFunction
 fi
 
-# TODO set variables for the replaces_env function 
-# (when devilbox updates, we need to set what to service enabled by default to disable)
-
-# TODO set a php version variable, so when copying custom.ini we cane
-# refference the correct directory
-
-# TODO create magento_loca_switch as entry point, ask for magento version so
-# we can execute that <version>/magento<version>_local_switch.sh. In <version> dir
-# we can have packed all files to copy and this specific version variables (as php version)
-
 ##
 ##
 ##
@@ -74,24 +54,22 @@ check_dbox
 ##
 ## Prepare devilbox enviroment
 ##
+## After these steps, you can perform a ./_start.sh in devilbox dir to run Devilbox
+## with all customizations perfrormed
+##
 ##
 ##
 
 echo "02 ---> creating needing directories and config files...";
 
-
 create_new_env_file
 
 replaces_env $magento_version
 
-# additional containers
 enable_additional_containers $magento_version
 
-# customize php.ini settings
 customize_php_ini $magento_version
 
-
-# create start devilbox script: httpd, php, mysql, mailhog, elasitcsearch
 create_start_dbox_script $magento_version
 
 

@@ -1,8 +1,12 @@
 #! /bin/bash
 
 ##
-## This script downloads and installs a magento 2.4.x instance
-## and prepares a local enviroment for it in Devilbox
+## This script first prepares Devilbox enviroment for a particular magento version (reusing another script for this),
+## then creates new dirs and files for a new project (reusing another script for this)
+## and creates a required by parameter magento install script inside this new project, so you can enter php 
+## container and run it for a full magento required version install and config
+##
+## in help_function you can see required parameters
 ##
 
 # includes
@@ -63,8 +67,6 @@ done
 ./magento2.4_local_switch.sh -m $magento_version
 
 ## execute remaining steps only executed when new project is created
-create_project_dir
-
-create_local_hosts_entry
+./create_devilbox_project.sh $project_name
 
 create_install_script
