@@ -241,6 +241,25 @@ function create_start_dbox_script {
     echo "    -- $_file_path created"
 }
 
+function finish_devilbox_preparation_feedback_message {
+    echo
+    echo
+    echo "Finished preparing devilbox enviroment..." 
+    echo "for magento version: $1"
+    echo
+    echo
+}
+
+function finish_devilbox_create_project_feedback_message {
+    echo
+    echo
+    echo "Finished creating devilbox project..." 
+    echo "project dir: /$1"
+    echo "local domain: http://$1.loc"
+    echo
+    echo
+}
+
 function create_install_script {
     echo "create install script"
 }

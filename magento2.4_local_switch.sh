@@ -75,6 +75,17 @@ create_start_dbox_script $magento_version
 
 
 
+##
+##
+##
+## Finish feedback message
+##
+##
+##
+##
+
+finish_devilbox_preparation_feedback_message $magento_version
+
 
 ##
 ##

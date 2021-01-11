@@ -69,4 +69,6 @@ done
 ## execute remaining steps only executed when new project is created
 ./create_devilbox_project.sh $project_name
 
+finish_devilbox_create_project_feedback_message $project_name
+
 create_install_script
