@@ -27,6 +27,16 @@ function check_dbox_env_file {
     fi
 }
 
+function check_dbox {
+    echo "01 ---> checking deviblox enviroment...";
+
+    check_dbox_dir
+
+    check_dbox_www_dir
+
+    check_dbox_env_file
+}
+
 function create_project_dir {
     _project_dir="$dbox_www_dir/$project_name"
 
@@ -78,6 +88,26 @@ function create_new_env_file {
     echo "    -- new .env file created"
 }
 
+function replaces_env_enable {
+    # enable apache_2_4
+    service="$1"
+    service_search="#$service"
+    service_replace="$service"
+    sed -i "s/$service_search/$service_replace/" $_file
+
+    echo "    ++ $service enabled"
+}
+
+function replaces_env_disable {
+    # disable nginx_stable
+    service=$1
+    service_search="$service"
+    service_replace="#$service"
+    sed -i "s/$service_search/$service_replace/" $_file
+
+    echo "    -- $service disabled"
+}
+
 function replaces_env {
     _file="$dbox_dir/.env"
     
@@ -90,59 +120,30 @@ function replaces_env {
     # php 7_4 already enabled by default
 
     ## web server
-    # disable nginx_stable
-    service="HTTPD_SERVER=nginx-stable"
-    service_search="$service"
-    service_replace="#$service"
-    sed -i "s/$service_search/$service_replace/" $_file
+    replaces_env_disable "HTTPD_SERVER=nginx-stable"
 
-    # enable apache_2_4
-    service="HTTPD_SERVER=apache-2.4"
-    service_search="#$service"
-    service_replace="$service"
-    sed -i "s/$service_search/$service_replace/" $_file
-
-    echo "    -- $service"
+    replaces_env_enable "HTTPD_SERVER=apache-2.4"
 
     ## database engine
-    # disable mariadb
-    service="MYSQL_SERVER=mariadb-10.5"
-    service_search="$service"
-    service_replace="#$service"
-    sed -i "s/$service_search/$service_replace/" $_file
+    replaces_env_disable "MYSQL_SERVER=mariadb-10.5"
 
-    # enable mysql
-    service="MYSQL_SERVER=mysql-8.0"
-    service_search="#$service"
-    service_replace="$service"
-    sed -i "s/$service_search/$service_replace/" $_file
-    
-    echo "    -- $service"
+    replaces_env_enable "MYSQL_SERVER=mysql-8.0"
 
     ## redis
-    # disable redis_6
-    service="REDIS_SERVER=6.0"
-    service_search="$service"
-    service_replace="#$service"
-    sed -i "s/$service_search/$service_replace/" $_file
+    replaces_env_disable "REDIS_SERVER=6.0"
+    
     # fix: delete double # in redis_6_alpine
+    ## TODO: make it another way so this does not have to be fixed
     service="REDIS_SERVER=6.0-alpine"
     service_search="##$service"
     service_replace="#$service"
     sed -i "s/$service_search/$service_replace/" $_file
 
-    # enable redis_5
-    service="REDIS_SERVER=5.0"
-    service_search="#$service"
-    service_replace="$service"
-    sed -i "s/$service_search/$service_replace/" $_file
-    # fix: disable redis_5_alpine
-    service="REDIS_SERVER=5.0-alpine"
-    service_search="$service"
-    service_replace="#$service"
-    sed -i "s/$service_search/$service_replace/" $_file
+    replaces_env_enable "REDIS_SERVER=5.0"
     
-    echo "    -- $service"
+    # fix: disable redis_5_alpine
+    ## TODO: make it another way so this does not have to be fixed
+    replaces_env_disable "REDIS_SERVER=5.0-alpine"
 
     ## local fylesystem
     # change local project dir 

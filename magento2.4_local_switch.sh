@@ -41,13 +41,7 @@ source "$PWD/includes/functions.sh"
 ##
 ##
 
-echo "01 ---> checking deviblox enviroment...";
-
-check_dbox_dir
-
-check_dbox_www_dir
-
-check_dbox_env_file
+check_dbox
 
 
 
