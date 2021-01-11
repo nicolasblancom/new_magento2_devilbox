@@ -42,9 +42,25 @@ then
    helpFunction
 fi
 
+# Ask for magento version to install
+select versions in 2.4.1 "Enter another version" ;
+do
+    case "$versions" in
+        2.4.1)
+            magento_version=2.4.1
+            break
+            ;;
+        Enter*)
+            read -p "Enter manually a version number: " magento_version
+            break
+            ;;
+    esac
+done
+
+# TODO: check ilegal version
 
 ## execute script to config devilbox for magento 2.4
-./magento2.4_local_switch.sh
+./magento2.4_local_switch.sh -m $magento_version
 
 ## execute remaining steps only executed when new project is created
 create_project_dir

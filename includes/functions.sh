@@ -89,7 +89,6 @@ function create_new_env_file {
 }
 
 function replaces_env_enable {
-    # enable apache_2_4
     service="$1"
     service_search="#$service"
     service_replace="$service"
@@ -99,7 +98,6 @@ function replaces_env_enable {
 }
 
 function replaces_env_disable {
-    # disable nginx_stable
     service=$1
     service_search="$service"
     service_replace="#$service"
@@ -108,14 +106,7 @@ function replaces_env_disable {
     echo "    -- $service disabled"
 }
 
-function replaces_env {
-    _file="$dbox_dir/.env"
-    
-    if [ ! -f "$_file" ]; then
-        echo "Error: no .env file found"
-        exit 1
-    fi
-
+function replaces_env_2_4_1 {
     ## php
     # php 7_4 already enabled by default
 
@@ -161,9 +152,30 @@ function replaces_env {
     echo "    -- $service"
 }
 
+function replaces_env {
+    _file="$dbox_dir/.env"
+    
+    if [ ! -f "$_file" ]; then
+        echo "Error: no .env file found"
+        exit 1
+    fi
+
+    case "$1" in
+        2.4.1 ) replaces_env_2_4_1 ;;
+        * ) echo "Error ${FUNCNAME[0]}: magento version provided is not available in script yet!!!"; exit 1 ;;
+    esac
+}
+
 function enable_additional_containers {
+    if [ $# -eq 0 ]; then
+        echo "Error ${FUNCNAME[0]}: you must provide a magento version parameter"
+
+        exit 1
+    fi
+    
     _file_name="docker-compose.override.yml"
     _file_path="$dbox_dir/$_file_name"
+    _origin_file_path="to_copy/docker-compose.override/$1/$_file_name"
 
     # TODO delete rm line
     rm $_file_path > /dev/null 2>&1
@@ -173,15 +185,27 @@ function enable_additional_containers {
         exit 1
     fi
 
-    cp "to_copy/$_file_name" "$_file_path"
+    cp "$_origin_file_path" "$_file_path"
     chown -R $MYUSER:$MYUSER $_file_path
 
     echo "    -- $_file_path created"
 }
 
 function customize_php_ini {
+    if [ $# -eq 0 ]; then
+        echo "Error ${FUNCNAME[0]}: you must provide a magento version parameter"
+
+        exit 1
+    fi
+
+    case "$1" in
+        2.4.1 ) php_version=7.4 ;;
+        * ) echo "Error ${FUNCNAME[0]}: magento version provided is not available in script yet!!!"; exit 1 ;;
+    esac
+
     _file_name="custom.ini"
-    _file_path="$dbox_dir/cfg/php-ini-7.4/$_file_name"
+    _file_path="$dbox_dir/cfg/php-ini-$php_version/$_file_name"
+    _origin_file_path="to_copy/php.ini/$php_version/custom.ini"
 
     # TODO delete rm line
     rm $_file_path > /dev/null 2>&1
@@ -191,15 +215,27 @@ function customize_php_ini {
         exit 1
     fi
 
-    cp "to_copy/$_file_name" "$_file_path"
+    cp "$_origin_file_path" "$_file_path"
     chown -R $MYUSER:$MYUSER $_file_path
 
     echo "    -- $_file_path created"
 }
 
 function create_start_dbox_script {
+    if [ $# -eq 0 ]; then
+        echo "Error ${FUNCNAME[0]}: you must provide a magento version parameter"
+
+        exit 1
+    fi
+
+    case "$1" in
+        2.4* ) start_magento_version=2.4 ;;
+        * ) echo "Error ${FUNCNAME[0]}: magento version provided is not available in script yet!!!"; exit 1 ;;
+    esac
+
     _file_name="_start.sh"
     _file_path="$dbox_dir/$_file_name"
+    _origin_file_path="to_copy/start_script/$start_magento_version/$_file_name"
 
     # TODO delete rm line
     rm $_file_path > /dev/null 2>&1
@@ -209,7 +245,7 @@ function create_start_dbox_script {
         exit 1
     fi
 
-    cp "to_copy/$_file_name" "$_file_path"
+    cp "$_origin_file_path" "$_file_path"
     chown -R $MYUSER:$MYUSER $_file_path
     chmod +x $_file_path
 

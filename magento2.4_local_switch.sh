@@ -1,8 +1,7 @@
 #! /bin/bash
 
 ##
-## This script downloads and installs a magento 2.4.x instance
-## and prepares a local enviroment for it in Devilbox
+## $magento_version: string     magento version to install or config devilbox to
 ##
 
 ##
@@ -22,6 +21,29 @@
 source "$PWD/includes/variables.sh"
 source "$PWD/includes/functions.sh"
 
+# help menu, require options, feedback user
+helpFunction()
+{
+   echo ""
+   echo "Usage: $0 -m magento_version"
+   echo -e "\t-m Magento version you want to install or config devilbox to"
+   
+   exit 1
+}
+
+while getopts "m:" opt
+do
+    case "$opt" in
+        m ) magento_version="$OPTARG" ;;
+        ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
+    esac
+done
+
+# Print helpFunction in case parameters are empty
+if [ -z "$magento_version" ]; then
+   echo "Some or all of the parameters are empty in $0";
+   helpFunction
+fi
 
 # TODO set variables for the replaces_env function 
 # (when devilbox updates, we need to set what to service enabled by default to disable)
@@ -60,17 +82,17 @@ echo "02 ---> creating needing directories and config files...";
 
 create_new_env_file
 
-replaces_env
+replaces_env $magento_version
 
 # additional containers
-enable_additional_containers
+enable_additional_containers $magento_version
 
 # customize php.ini settings
-customize_php_ini
+customize_php_ini $magento_version
 
 
 # create start devilbox script: httpd, php, mysql, mailhog, elasitcsearch
-create_start_dbox_script
+create_start_dbox_script $magento_version
 
 
 
