@@ -1,20 +1,23 @@
-# Create a (Magento 2.4 + Devilbox) or config devilbox as Magento 2.4 needs it
+# Create a (Magento 2 + Devilbox) or config devilbox as Magento 2.4 needs it
 
 ## General
 
-The main objective is to create a new Magento 2 instance for local development, as fast as possible and with few steps.
+**The main objective** is to create a new Magento 2 instance for local development, as fast as possible and with few steps, regardless what Magento 2 version you need (only 2.4.1 is supported for now).
 
-This is a set of 3 scripts:
+**This is a set of 3 scripts:**
 
-- 01_magento2_create_new_local_project.sh does all the work. (A) Checks Devilbox configuration, configures it for Magento 2 needings, (B) creates project directories with /etc/hosts entry, (C)copies an installation script to execute it from inside the php container (it installs and configures magento 2 for local development)
-- 02_devilbox_config_enviroment.sh just configures devilbox for magento 2 needings (A point from above only)
-- 03_devilbox_create_new_project.sh just creates devilbox project directories and entry in /etc/hosts (B point from above only)
+- **01_magento2_create_new_local_project.sh** does all the work. (A) Checks Devilbox configuration, configures it for Magento 2 needings, (B) creates project directories with /etc/hosts entry, (C) copies an installation script to execute it from inside the php container (it installs and configures magento 2 for local development)
+- **02_devilbox_config_enviroment.sh** just configures devilbox for magento 2 needings (A point from above only)
+- **03_devilbox_create_new_project.sh** just creates devilbox project directories and entry in /etc/hosts (B point from above only)
 
 ## Requirements
 
 - Latest Devilbox installation https://devilbox.readthedocs.io/en/latest/getting-started/install-the-devilbox.html
 
-**IMPORTANT** It will configure your devilbox project dir as ~/www-projects (this is configured in devilbox/.env file). **It will delete** devilbox/.env and devilbox/cfg/php-ini-<version>/custom.ini files every time it's executed (it does needed replaces in those files to configure Devilbox properly), so make sure you have backup of those files.
+**IMPORTANT** 
+
+- It will configure your devilbox project dir as `~/www-projects` (this is configured in `<devilboxdir>/.env` file). 
+- **It will delete** `<devilboxdir>/.env` and `devilbox/cfg/php-ini-<version>/custom.ini` files every time it's executed (it does needed replaces in .env file and copies a custom.ini file to configure Devilbox properly), so make sure you have backup of those files.
 
 ## Usage
 
@@ -24,7 +27,7 @@ This is a set of 3 scripts:
 
 **Create new Magento 2 project**
 
-- Open to_copy/install_magento/<version>/auth.json and paste your magento marketplace keys to avoid beign asked for credentials when the install script does the 'composer create-project' part
+- Open `to_copy/install_magento/<version>/auth.json` and paste your magento marketplace keys to avoid beign asked for credentials when the install script does the `composer create-project` part
 - Execute `sudo ./01_magento2_create_new_local_project.sh -m exampleproject` and follow instructions
     - When it finishes, you will be given 2 command to execute. Just copy and paste them in a new shell
     - First command will enter devilbox php container
