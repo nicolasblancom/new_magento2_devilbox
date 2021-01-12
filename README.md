@@ -1,4 +1,4 @@
-# Create a (Magento 2 + Devilbox) or config devilbox as Magento 2.4 needs it
+# Create a (Magento 2 + Devilbox) or config devilbox as Magento 2 needs it
 
 ## General
 
