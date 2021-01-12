@@ -7,7 +7,7 @@
 - [X] create db creation script
 - [X] create download magento and install script
 - [X] create magento post installation script
-- [ ] clean unnecesary parameters
+- [X] clean unnecesary parameters
 - [ ] clean file names and main file name (main scripts should be generic as they will get called in a CLI)
 - [ ] restructure includes, functions and script directories
 - [ ] create each step extension system (if certain script exists, then execute it)

@@ -84,7 +84,7 @@ function replaces_env_enable {
     service_replace="$service"
     sed -i "s/$service_search/$service_replace/" $_file
 
-    echo "    ++ $service enabled"
+    echo "    -- $service enabled"
 }
 
 ## .env replace to disable line
@@ -276,8 +276,7 @@ function finish_devilbox_create_project_feedback_message {
     echo "  project dir: /$1, local domain: http://$1.loc"
     echo
     echo "- run: cd $dbox_dir && ./_start.sh && ./shell.sh"
-    echo "  run inside container: cd $1/"
-    echo "  then run: ./install_magento.sh"
+    echo "  you're inside php container, so run: cd $1/ && ./install_magento.sh"
     echo
 }
 

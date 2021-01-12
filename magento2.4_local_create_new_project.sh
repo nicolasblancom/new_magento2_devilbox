@@ -38,23 +38,22 @@ helpFunction()
 {
    echo ""
    echo "Usage: sudo $0 -p project_name -b parameterB"
-   echo -e "\t-p Description of what is project_name"
-   echo -e "\t-b Description of what is parameterB"
+   echo -e "\t-p you new project name (will match: project dir, database, local domain with .loc)"
    exit 1
 }
 
-while getopts "p:b:" opt
+while getopts "p:" opt
 do
     case "$opt" in
         p ) project_name="$OPTARG" ;;
-        b ) parameterB="$OPTARG" ;;
         ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
     esac
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$project_name" ] || [ -z "$parameterB" ]
+if [ -z "$project_name" ]
 then
+   echo
    echo "Some or all of the parameters are empty";
    helpFunction
 fi
