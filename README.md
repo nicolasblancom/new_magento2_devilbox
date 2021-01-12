@@ -20,13 +20,26 @@ This is a set of 3 scripts:
 
 - Clone repo or download it wherever you want in your fylesystem
 - Give execution permission to the 3 main .sh files
+- _It is a TODO for now_: open `includes/variables.sh` and give the variable `MYUSER` your local user name (this is because the 01 script needs sudo, just to be able to write in /etc/hosts, for making things easier the script just continues as sudo but using that username home directory)
+
+**Create new Magento 2 project**
+
 - Open to_copy/install_magento/<version>/auth.json and paste your magento marketplace keys to avoid beign asked for credentials when the install script does the 'composer create-project' part
-- Execute ./01_magento2_create_new_local_project.sh -m exampleproject and follow instructions
+- Execute `sudo ./01_magento2_create_new_local_project.sh -m exampleproject` and follow instructions
     - When it finishes, you will be given 2 command to execute. Just copy and paste them in a new shell
     - First command will enter devilbox php container
     - Second command will execute magento 2 installation and configuration from inside the php container (it performs a composer installation)
 
-**TODO**
+**Configure Devilbox for Magento 2 or "switch" its configuration for the Magento version you need**
+
+- Execute `./02_devilbox_config_enviroment.sh`
+- Execute the newly created `<devilboxdir>/_start.sh` script so it runs needed Docker containers
+
+**Create new Devilbox project**
+
+- Execute `03_devilbox_create_new_project.sh`
+
+## TODO list
 
 - [X] complete "TODOs" from magento2.4_local_switch.sh
 - [X] create a dir structure following magento versions, so we can config or create different magento versions (a variable to switch between them will be needed)
