@@ -1,5 +1,6 @@
 # local user data
 
+# TODO: ask for this info if not already set in this script
 MYUSER="nicolasblancom"
 MYSUSER_CHOWN=$MYUSER
 MYUSER_HOME_DIR="/home/$MYUSER"

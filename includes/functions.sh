@@ -6,6 +6,28 @@
 ##
 ##
 
+# Gives welcome, short explanation, ask for action to continue
+function welcome_continue_create_project {
+    echo 
+    echo "This script needs Devilbox installed in your system. For more information: https://devilbox.readthedocs.io/en/latest/getting-started/install-the-devilbox.html"
+    echo
+    echo "**IMPORTANT**: this script will delete your devilbox/.env file and the devilbox/cfg/php-ini-<version>/custom.ini file, make sure to backup those"
+    echo 
+    echo "-- sudo is needed, as the script needs to write in your /etc/hosts file"
+    echo "-- the script will make <your-user-home-dir>/www-projects as your devilbox project directory"
+    echo 
+    echo "Instructions: just copy and paste the commands you are given when the script finishes"
+    
+    read -p "Are you sure you want to continue? (y/n)" decision
+
+    case "$decision" in
+        y ) return 0 ;;
+        n ) echo "...canceled by user..."; exit 1 ;;
+        * ) echo "...incorrect option..."; exit 1 ;;
+    esac
+}
+
+
 function check_dbox_dir {
     if [ ! -d $dbox_dir ]; then
         echo "Error: $dbox_dir does not exist..."
@@ -241,25 +263,66 @@ function create_start_dbox_script {
     echo "    -- $_file_path created"
 }
 
+## Give feedback message when devilbox is correctly configurated
 function finish_devilbox_preparation_feedback_message {
     echo
-    echo
-    echo "Finished preparing devilbox enviroment..." 
-    echo "for magento version: $1"
-    echo
+    echo "Finished preparing devilbox enviroment for magento version: $1"
     echo
 }
-
+## Give feedback message when devilbox project is correctly created and configurated
 function finish_devilbox_create_project_feedback_message {
     echo
+    echo "- Finished creating devilbox project..." 
+    echo "  project dir: /$1, local domain: http://$1.loc"
     echo
-    echo "Finished creating devilbox project..." 
-    echo "project dir: /$1"
-    echo "local domain: http://$1.loc"
-    echo
+    echo "- run: cd $dbox_dir && ./_start.sh && ./shell.sh"
+    echo "  run inside container: cd $1/"
+    echo "  then run: ./install_magento.sh"
     echo
 }
 
-function create_install_script {
-    echo "create install script"
+## Copies install script into devilibox project directories and makes replaces on it
+function mageinstall_create_install_script {
+    if [ $# -eq 0 ]; then
+        echo "Error: You need to give 2 parameters: magento_version project_name"
+        exit 1
+    fi
+
+    if [ -z "$2" ]; then
+        echo "Error: You need to give second parameter project_name"
+        exit 1
+    fi
+
+    if [ -z "$1" ]; then
+        echo "Error: You need to give first parameter magento_version"
+        exit 1
+    fi
+
+    magento_version=$1
+    project_name=$2
+
+    # copy script to project dir (from there we will run installation when entered in container)
+    _file_name="install_magento.sh"
+    _file_path="$dbox_www_dir/$project_name/$_file_name"
+    _origin_file_path="to_copy/install_magento/$magento_version/$_file_name"
+
+    cp "$_origin_file_path" "$_file_path"
+    chown -R $MYUSER:$MYUSER $_file_path
+    chmod +x $_file_path
+
+    # copy auth.json with composer credential for magento repo in project dir (from 
+    # there we have to copy to devilbox user home inside the container)
+    _file_name2="auth.json"
+    _file_path2="$dbox_www_dir/$project_name/$_file_name2"
+    _origin_file_path2="to_copy/install_magento/$magento_version/$_file_name2"
+
+    cp "$_origin_file_path2" "$_file_path2"
+    chown -R $MYUSER:$MYUSER $_file_path2
+
+    # replace in script database creation with project_name
+    sed -i "s/##project_name##/$project_name/" $_file_path
+
+
+    # replace in script download magento url with magento_version
+    sed -i "s/##magento_version##/$magento_version/" $_file_path
 }

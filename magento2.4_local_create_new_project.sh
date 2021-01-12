@@ -16,6 +16,19 @@ source "$PWD/includes/functions.sh"
 ##
 ##
 ##
+## Welcome/instruction message and ask for continue
+##
+##
+##
+welcome_continue_create_project
+
+
+
+
+
+##
+##
+##
 ## Print help and check command line arguments
 ##
 ##
@@ -71,4 +84,4 @@ done
 
 finish_devilbox_create_project_feedback_message $project_name
 
-create_install_script
+mageinstall_create_install_script $magento_version $project_name
