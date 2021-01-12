@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ## 
-## This script prepares Devilbox enviroment for a particular magento version
+## This script configurates Devilbox enviroment for a particular magento version
 ##
 ## $magento_version: string     magento version to install or config devilbox to
 ## in help_function you can see required parameters
@@ -73,18 +73,6 @@ customize_php_ini $magento_version
 create_start_dbox_script $magento_version
 
 
-
-
-##
-##
-##
-## Finish feedback message
-##
-##
-##
-##
-
-finish_devilbox_preparation_feedback_message $magento_version
 
 
 ##

@@ -17,6 +17,8 @@ function welcome_continue_create_project {
     echo "-- the script will make <your-user-home-dir>/www-projects as your devilbox project directory"
     echo 
     echo "Instructions: just copy and paste the commands you are given when the script finishes"
+    echo "a 'devilbox/_start.sh' file will be created so you can run containers again the same way"
+    echo 
     
     read -p "Are you sure you want to continue? (y/n)" decision
 
@@ -263,22 +265,6 @@ function create_start_dbox_script {
     echo "    -- $_file_path created"
 }
 
-## Give feedback message when devilbox is correctly configurated
-function finish_devilbox_preparation_feedback_message {
-    echo
-    echo "Finished preparing devilbox enviroment for magento version: $1"
-    echo
-}
-## Give feedback message when devilbox project is correctly created and configurated
-function finish_devilbox_create_project_feedback_message {
-    echo
-    echo "- Finished creating devilbox project..." 
-    echo "  project dir: /$1, local domain: http://$1.loc"
-    echo
-    echo "- run: cd $dbox_dir && ./_start.sh && ./shell.sh"
-    echo "  you're inside php container, so run: cd $1/ && ./install_magento.sh"
-    echo
-}
 
 ## Copies install script into devilibox project directories and makes replaces on it
 function mageinstall_create_install_script {

@@ -15,6 +15,7 @@ fi
 source "$PWD/includes/variables.sh"
 project_name=$1
 
+
 ## creates a new directory in devilbox project directory
 ## external variables:  $dbox_www_dir devilbox projects dir path
 ##                      $project_name string asked to the user
@@ -60,4 +61,7 @@ function create_devilbox_project {
     create_project_dir
     create_local_hosts_entry
 }
+
+
+echo "03 ---> creating new devilbox project directories and /etc/hosts entry..."
 create_devilbox_project

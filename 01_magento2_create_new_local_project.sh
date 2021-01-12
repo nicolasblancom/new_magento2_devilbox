@@ -76,11 +76,16 @@ done
 # TODO: check ilegal version
 
 ## execute script to config devilbox for magento 2.4
-./magento2.4_local_switch.sh -m $magento_version
+./02_devilbox_config_enviroment.sh -m $magento_version
 
 ## execute remaining steps only executed when new project is created
-./create_devilbox_project.sh $project_name
+./03_devilbox_create_new_project.sh $project_name
 
-finish_devilbox_create_project_feedback_message $project_name
+echo
+echo "OK! Finished creating devilbox project..." 
+echo "    -- project dir: /$project_name, local domain: http://$project_name.loc"
+echo "    -- run: cd $dbox_dir && ./_start.sh && ./shell.sh"
+echo "       you're inside php container, so run: cd $project_name/ && ./install_magento.sh"
+echo
 
 mageinstall_create_install_script $magento_version $project_name
