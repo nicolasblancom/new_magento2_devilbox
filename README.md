@@ -17,7 +17,7 @@
 **IMPORTANT** 
 
 - It will configure your devilbox project dir as `~/www-projects` (this is configured in `<devilboxdir>/.env` file). 
-- **It will delete** `<devilboxdir>/.env` and `devilbox/cfg/php-ini-<version>/custom.ini` files every time it's executed (it does needed replaces in .env file and copies a custom.ini file to configure Devilbox properly), so make sure you have backup of those files.
+- **It will delete** `<devilboxdir>/.env`, `devilbox/cfg/php-ini-<version>/custom.ini` and `<devilboxdir>/docker-compose.override.yml` files every time it's executed (it does needed replaces in .env file and copies a custom.ini file to configure Devilbox properly), so make sure you have backup of those files.
 
 ## Usage
 
