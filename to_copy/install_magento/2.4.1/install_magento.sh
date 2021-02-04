@@ -14,8 +14,8 @@
 ##
 
 function create_database {
-    mysql -h mysql -u root --password='' -e "DROP DATABASE IF EXISTS ##project_name##;"
-    mysql -h mysql -u root --password='' -e "CREATE DATABASE ##project_name##;"
+    mysql -h mysql -u root --password='' -e "DROP DATABASE IF EXISTS \`##project_name##\`;"
+    mysql -h mysql -u root --password='' -e "CREATE DATABASE \`##project_name##\`;"
     
     # parece que no hace falta darle permisos
     echo
@@ -49,6 +49,8 @@ download_magento
 
 # set file permissions
 function set_permissions {
+    ## TODO check if not in this directory first
+    
     cd htdocs
     find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
     find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
@@ -63,7 +65,8 @@ set_permissions
 
 # run magento installation
 function install_magento {
-    cd htdocs
+    ## TODO: already moved in previous function call, check if not in this directory first
+    # cd htdocs
 
     php -d memory_limit=-1 bin/magento setup:install \
     --base-url=http://##project_name##.loc/ \
@@ -87,7 +90,8 @@ install_magento
 
 # run post installation steps
 function post_install_steps {
-    cd htdocs
+    ## TODO: check if not in this directory first
+    ## cd htdocs
 
     # install Pestle
     curl -LO http://pestle.pulsestorm.net/pestle.phar

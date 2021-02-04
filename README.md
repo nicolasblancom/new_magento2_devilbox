@@ -28,7 +28,7 @@
 **Create new Magento 2 project**
 
 - Open `to_copy/install_magento/<version>/auth.json` and paste your magento marketplace keys to avoid beign asked for credentials when the install script does the `composer create-project` part
-- Execute `sudo ./01_magento2_create_new_local_project.sh -m exampleproject` and follow instructions
+- Execute `sudo ./01_magento2_create_new_local_project.sh -p exampleproject` (replace exampleproject to your project's name) and follow instructions
     - When it finishes, you will be given 2 command to execute. Just copy and paste them in a new shell
     - First command will enter devilbox php container
     - Second command will execute magento 2 installation and configuration from inside the php container (it performs a composer installation)
