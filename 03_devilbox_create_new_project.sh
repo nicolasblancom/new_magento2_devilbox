@@ -6,13 +6,14 @@
 ## parameters:  $1 ($project_name) string defining new project name
 ## 
 
+source "$PWD/includes/variables.sh"
+
 if [ $# -eq 0 ]; then
-    echo "Error in $0: you must provide a $project_name parameter"
+    echo -e "${T_CRED}Error in $0: you must provide a $project_name parameter${T_CNCOLOR}"
 
     exit 1
 fi
 
-source "$PWD/includes/variables.sh"
 project_name=$1
 
 
@@ -31,7 +32,7 @@ function create_project_dir {
         return 0
     fi
 
-    echo "Error: $_project_dir already exists! Delete it first"
+    echo -e "${T_CRED}Error: $_project_dir already exists! Delete it first${T_CNCOLOR}"
 }
 
 ## creates a new hosts entry, needs sudo

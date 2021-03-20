@@ -37,7 +37,7 @@ welcome_continue_create_project
 helpFunction()
 {
    echo ""
-   echo "Usage: sudo $0 -p project_name -b parameterB"
+   echo "Usage: sudo $0 -p project_name"
    echo -e "\t-p you new project name (will match: project dir, database, local domain with .loc)"
    exit 1
 }
@@ -59,11 +59,16 @@ then
 fi
 
 # Ask for magento version to install
-select versions in 2.4.1 "Enter another version" ;
+# ToExtend: add new version in select and in case
+select versions in 2.4.1 2.4.2 "Enter another version" ;
 do
     case "$versions" in
         2.4.1)
             magento_version=2.4.1
+            break
+            ;;
+        2.4.2)
+            magento_version=2.4.2
             break
             ;;
         Enter*)

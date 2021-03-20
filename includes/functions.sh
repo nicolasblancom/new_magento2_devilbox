@@ -68,7 +68,7 @@ function create_new_env_file {
         rm "$dbox_dir/.env" > /dev/null 2>&1
 
     if [ -f "$dbox_dir/.env" ]; then
-        echo "Error: .env file already exists!! Delete ir first"
+        echo "Error: .env file already exists!! Delete it first"
         exit 1
     fi
 
@@ -113,7 +113,8 @@ function replaces_env_fylesystem {
 }
 
 ## .env replaces for specific magento 2.4.1 version
-function replaces_env_2_4_1 {
+function replaces_env_helpers {
+    # TODO a better possible way to doing it is to search a "service" for example PHP_SERVER, delete the entire line and after it, just leave the line as we want (enabled or disabled and with the value we want)
     ## php
     # php 7_4 already enabled by default
 
@@ -156,7 +157,6 @@ function replaces_env_2_4_1 {
 }
 
 ## makes necessary .env replaces depending on magento version
-## params   $1: magento version string
 function replaces_env {
     _file="$dbox_dir/.env"
     
@@ -165,8 +165,11 @@ function replaces_env {
         exit 1
     fi
 
-    case "$1" in
-        2.4.1 ) replaces_env_2_4_1 ;;
+    # TODO: main refactor. At this point we have to know all specification in separate variables and pass them to a unique function. Variables should be all what is defined in replaces_env_2_4_1
+    # To extend: provide proper values to variables once refactor done
+    case "$magento_version" in
+        2.4.1 ) replaces_env_helpers ;;
+        2.4.2 ) replaces_env_helpers ;;
         * ) echo "Error ${FUNCNAME[0]}: magento version provided is not available in script yet!!!"; exit 1 ;;
     esac
 }
@@ -181,9 +184,11 @@ function enable_additional_containers {
 
         exit 1
     fi
-    
+
+    # TODO: extract to variables.sh file
     _file_name="docker-compose.override.yml"
     _file_path="$dbox_dir/$_file_name"
+    # TODO: main refactor. Extract in a function what magento version need what docker-compose.override file (from 2.4.0 and after it needs elastic container, but it is not needed a specific file for 2.4.0 and 2.4.1 and 2.4.2, etc)
     _origin_file_path="to_copy/docker-compose.override/$1/$_file_name"
 
     # TODO delete rm line
@@ -211,6 +216,7 @@ function customize_php_ini {
 
     case "$1" in
         2.4.1 ) php_version=7.4 ;;
+        2.4.2 ) php_version=7.4 ;;
         * ) echo "Error ${FUNCNAME[0]}: magento version provided is not available in script yet!!!"; exit 1 ;;
     esac
 
@@ -241,6 +247,7 @@ function create_start_dbox_script {
         exit 1
     fi
 
+  # To extend: add more cases if the magento version is not covered correctly in the case
     case "$1" in
         2.4* ) start_magento_version=2.4 ;;
         * ) echo "Error ${FUNCNAME[0]}: magento version provided is not available in script yet!!!"; exit 1 ;;

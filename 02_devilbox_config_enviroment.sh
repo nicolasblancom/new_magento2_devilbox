@@ -12,6 +12,23 @@ source "$PWD/includes/variables.sh"
 source "$PWD/includes/functions.sh"
 
 # help menu, require options, feedback user
+setMagentoVersion()
+{
+    magento_version=$1
+}
+
+askInstallDefaultMagentoVersion()
+{
+    # User has not provided magento_version parameter, so install default version?
+    read -p "Install default Magento version [${magento_version_default}]? (y/n)" decision
+    case $decision in
+        y ) setMagentoVersion $magento_version_default; return 1 ;;
+        n ) helpFunction; return 0 ;;
+    esac
+
+    exit 1
+}
+
 helpFunction()
 {
    echo ""
@@ -25,14 +42,13 @@ while getopts "m:" opt
 do
     case "$opt" in
         m ) magento_version="$OPTARG" ;;
-        ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
+        ? ) askInstallDefaultMagentoVersion ;; # Ask for default magento version installation in case parameter is non-existent
     esac
 done
 
-# Print helpFunction in case parameters are empty
+# Ask for default magento version installation in case parameters are empty
 if [ -z "$magento_version" ]; then
-   echo "Some or all of the parameters are empty in $0";
-   helpFunction
+   askInstallDefaultMagentoVersion
 fi
 
 ##
@@ -64,7 +80,8 @@ echo "02 ---> creating needing directories and config files...";
 
 create_new_env_file
 
-replaces_env $magento_version
+# TODO: main refactor. Instead of passing a magento version only as variable, we have to set all needed variables to configure it for that magento version and pass those variables
+replaces_env
 
 enable_additional_containers $magento_version
 
