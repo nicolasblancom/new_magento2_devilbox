@@ -78,82 +78,36 @@ function create_new_env_file {
     echo "    -- new .env file created"
 }
 
-## .env replace to enable line
-function replaces_env_enable {
-    service="$1"
+## Searchs inside the newly created .env file and injects a new line after the last match of the searched string
+## parameters:  $1 string to search
+##              $2 string to replace
+function inject_env_option_after_last_option_match {
+    tac $_file | awk '!p && /'"$1"'/{print "'$2'"; p=1} 1' | tac > tmp.txt && mv tmp.txt $_file
 
-    service_search="#$service"
-    service_replace="$service"
-    sed -i "s/$service_search/$service_replace/" $_file
-
-    echo "    -- $service enabled"
-}
-
-## .env replace to disable line
-function replaces_env_disable {
-    service=$1
-    
-    service_search="$service"
-    service_replace="#$service"
-    sed -i "s/$service_search/$service_replace/" $_file
-
-    echo "    -- $service disabled"
-}
-
-## .env base fylesystem replace
-function replaces_env_fylesystem {
-    # change local project dir 
-    line='HOST_PATH_HTTPD_DATADIR\=\.\/data\/www'
-    line_search=$line
-    line_replace='HOST_PATH_HTTPD_DATADIR\=\.\.\/www-projects'
-
-    sed -i "s/$line_search/$line_replace/" $_file
-
-    echo "    -- HOST_PATH_HTTPD_DATADIR\=\.\.\/www-projects"
+    echo "        -- $2"
 }
 
 ## .env replaces for specific magento 2.4.1 version
 function replaces_env_helpers {
     # TODO a better possible way to doing it is to search a "service" for example PHP_SERVER, delete the entire line and after it, just leave the line as we want (enabled or disabled and with the value we want)
+    echo "    -- Options injected in .env file:"
     ## php
-    # php 7_4 already enabled by default
+    inject_env_option_after_last_option_match "PHP_SERVER" $dbox_PHP_SERVER
 
     ## web server
-    replaces_env_disable "HTTPD_SERVER=nginx-stable"
-
-    replaces_env_enable "HTTPD_SERVER=apache-2.4"
+    inject_env_option_after_last_option_match "HTTPD_SERVER" $dbox_HTTPD_SERVER
 
     ## database engine
-    replaces_env_disable "MYSQL_SERVER=mariadb-10.5"
-
-    replaces_env_enable "MYSQL_SERVER=mysql-8.0"
+    inject_env_option_after_last_option_match "MYSQL_SERVER" $dbox_MYSQL_SERVER
 
     ## redis
-    replaces_env_disable "REDIS_SERVER=6.0"
-    
-    # fix: delete double # in redis_6_alpine
-    ## TODO: make it another way so this does not have to be fixed
-    service="REDIS_SERVER=6.0-alpine"
-    service_search="##$service"
-    service_replace="#$service"
-    sed -i "s/$service_search/$service_replace/" $_file
-
-    replaces_env_enable "REDIS_SERVER=5.0"
-    
-    # fix: disable redis_5_alpine
-    ## TODO: make it another way so this does not have to be fixed
-    replaces_env_disable "REDIS_SERVER=5.0-alpine"
+    inject_env_option_after_last_option_match "REDIS_SERVER" $dbox_REDIS_SERVER
 
     ## local fylesystem
-    replaces_env_fylesystem
+    inject_env_option_after_last_option_match "HOST_PATH_HTTPD_DATADIR" $dbox_HOST_PATH_HTTPD_DATADIR
     
     ## disable php modules
-    php_mods="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole"
-    php_mods_search="$php_mods"
-    php_mods_replace="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole,psr" # remove psr: conflicts because of a bug
-    sed -i "s/$php_mods_search/$php_mods_replace/" $_file
-
-    echo "    -- $php_mods php modules disabled"
+    inject_env_option_after_last_option_match "PHP_MODULES_DISABLE" $dbox_PHP_MODULES_DISABLE
 }
 
 ## makes necessary .env replaces depending on magento version
