@@ -23,6 +23,11 @@ dbox_MONGO_SERVER=4.4 # not used
 dbox_HOST_PATH_HTTPD_DATADIR="HOST_PATH_HTTPD_DATADIR=../www-projects"
 dbox_PHP_MODULES_DISABLE="PHP_MODULES_DISABLE=oci8,PDO_OCI,pdo_sqlsrv,sqlsrv,rdkafka,swoole,psr"
 
+# variables that change from magento to magento but in config terms are the same (DRY)
+php_version_for_ini="7.4"
+magento_version_for_docker_compose_override="2.4"
+magento_version_for_start_script="2.4"
+
 # default magento variables
 magento_version_default=2.4.1 # fallback version if user does not provide it as parameter
 

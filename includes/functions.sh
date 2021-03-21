@@ -87,9 +87,15 @@ function inject_env_option_after_last_option_match {
     echo "        -- $2"
 }
 
-## .env replaces for specific magento 2.4.1 version
-function replaces_env_helpers {
-    # TODO a better possible way to doing it is to search a "service" for example PHP_SERVER, delete the entire line and after it, just leave the line as we want (enabled or disabled and with the value we want)
+## makes necessary .env replaces depending on magento version
+function replaces_env {
+    _file="$dbox_dir/.env"
+    
+    if [ ! -f "$_file" ]; then
+        echo "Error: no .env file found"
+        exit 1
+    fi
+
     echo "    -- Options injected in .env file:"
     ## php
     inject_env_option_after_last_option_match "PHP_SERVER" $dbox_PHP_SERVER
@@ -105,51 +111,31 @@ function replaces_env_helpers {
 
     ## local fylesystem
     inject_env_option_after_last_option_match "HOST_PATH_HTTPD_DATADIR" $dbox_HOST_PATH_HTTPD_DATADIR
-    
+
     ## disable php modules
     inject_env_option_after_last_option_match "PHP_MODULES_DISABLE" $dbox_PHP_MODULES_DISABLE
 }
 
-## makes necessary .env replaces depending on magento version
-function replaces_env {
-    _file="$dbox_dir/.env"
-    
-    if [ ! -f "$_file" ]; then
-        echo "Error: no .env file found"
-        exit 1
-    fi
-
-    # TODO: main refactor. At this point we have to know all specification in separate variables and pass them to a unique function. Variables should be all what is defined in replaces_env_2_4_1
-    # To extend: provide proper values to variables once refactor done
-    case "$magento_version" in
-        2.4.1 ) replaces_env_helpers ;;
-        2.4.2 ) replaces_env_helpers ;;
-        * ) echo "Error ${FUNCNAME[0]}: magento version provided is not available in script yet!!!"; exit 1 ;;
-    esac
-}
-
 ## creates docker-compose.override.yml to enable additional containers in devilbox
-## parameters:  $1 magento version string
+## parameters:  $magento_version magento version string
 ##              $dbox_www_dir devilbox projects dir path
 ##              $project_name string asked to the user
 function enable_additional_containers {
-    if [ $# -eq 0 ]; then
-        echo "Error ${FUNCNAME[0]}: you must provide a magento version parameter"
-
-        exit 1
-    fi
-
     # TODO: extract to variables.sh file
     _file_name="docker-compose.override.yml"
     _file_path="$dbox_dir/$_file_name"
-    # TODO: main refactor. Extract in a function what magento version need what docker-compose.override file (from 2.4.0 and after it needs elastic container, but it is not needed a specific file for 2.4.0 and 2.4.1 and 2.4.2, etc)
-    _origin_file_path="to_copy/docker-compose.override/$1/$_file_name"
+
+    _origin_file_path="to_copy/docker-compose.override/$magento_version_for_docker_compose_override/$_file_name"
+    if [ ! -f "$_origin_file_path" ]; then
+        echo -e "${T_CRED}Error: $_origin_file_path does not exist${T_CNCOLOR}"
+        exit 1
+    fi
 
     # TODO delete rm line
     rm $_file_path > /dev/null 2>&1
 
     if [ -f "$_file_path" ]; then
-        echo "Error: $_file_path already exists! Delete it first"
+        echo -e "${T_CRED}Error: $_file_path already exists! Delete it first${T_CNCOLOR}"
         exit 1
     fi
 
@@ -160,29 +146,22 @@ function enable_additional_containers {
 }
 
 ## customizes php.ini by createing custom.ini inside devilbox config php files
-## parameters:  $1 magento version string
+## parameters:  $magento_version magento version string
 function customize_php_ini {
-    if [ $# -eq 0 ]; then
-        echo "Error ${FUNCNAME[0]}: you must provide a magento version parameter"
+    _file_name="custom.ini"
+    _file_path="$dbox_dir/cfg/php-ini-$php_version_for_ini/$_file_name"
+    _origin_file_path="to_copy/php.ini/$php_version_for_ini/custom.ini"
 
+    if [ ! -f "$_origin_file_path" ]; then
+        echo -e "${T_CRED}Error: $_origin_file_path does not exist${T_CNCOLOR}"
         exit 1
     fi
-
-    case "$1" in
-        2.4.1 ) php_version=7.4 ;;
-        2.4.2 ) php_version=7.4 ;;
-        * ) echo "Error ${FUNCNAME[0]}: magento version provided is not available in script yet!!!"; exit 1 ;;
-    esac
-
-    _file_name="custom.ini"
-    _file_path="$dbox_dir/cfg/php-ini-$php_version/$_file_name"
-    _origin_file_path="to_copy/php.ini/$php_version/custom.ini"
 
     # TODO delete rm line
     rm $_file_path > /dev/null 2>&1
 
     if [ -f "$_file_path" ]; then
-        echo "Error: $_file_path already exists! Delete it first"
+        echo -e "${T_CRED}Error: $_file_path already exists! Delete it first${T_CNCOLOR}"
         exit 1
     fi
 
@@ -193,29 +172,22 @@ function customize_php_ini {
 }
 
 ## creates a _start.sh script to run devilbox with these customized settings
-## parameters:  $1 magento version string
+## parameters:  $magento_version magento version string
 function create_start_dbox_script {
-    if [ $# -eq 0 ]; then
-        echo "Error ${FUNCNAME[0]}: you must provide a magento version parameter"
-
-        exit 1
-    fi
-
-  # To extend: add more cases if the magento version is not covered correctly in the case
-    case "$1" in
-        2.4* ) start_magento_version=2.4 ;;
-        * ) echo "Error ${FUNCNAME[0]}: magento version provided is not available in script yet!!!"; exit 1 ;;
-    esac
-
     _file_name="_start.sh"
     _file_path="$dbox_dir/$_file_name"
-    _origin_file_path="to_copy/start_script/$start_magento_version/$_file_name"
+    _origin_file_path="to_copy/start_script/$magento_version_for_start_script/$_file_name"
+
+    if [ ! -f "$_origin_file_path" ]; then
+        echo -e "${T_CRED}Error: $_origin_file_path does not exist${T_CNCOLOR}"
+        exit 1
+    fi
 
     # TODO delete rm line
     rm $_file_path > /dev/null 2>&1
 
     if [ -f "$_file_path" ]; then
-        echo "Error: $_file_path already exists! Delete it first"
+        echo -e "${T_CRED}Error: $_file_path already exists! Delete it first${T_CNCOLOR}"
         exit 1
     fi
 
@@ -227,7 +199,7 @@ function create_start_dbox_script {
 }
 
 
-## Copies install script into devilibox project directories and makes replaces on it
+## Copies install script into devilbox project directories and makes replaces on it
 function mageinstall_create_install_script {
     if [ $# -eq 0 ]; then
         echo "Error: You need to give 2 parameters: magento_version project_name"

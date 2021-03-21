@@ -38,6 +38,86 @@ helpFunction()
    exit 1
 }
 
+# sets all enviroment variables that devilbox needs in order to get configurated
+function set_env_variables_for_magento_version {
+  _error_count=0
+
+  # dbox_PHP_SERVER
+   case $magento_version in
+    "2.4.1"|"2.4.2")
+      dbox_PHP_SERVER="PHP_SERVER=7.4" ;;
+    *)
+      ((_error_count++))
+      echo -e "${T_CRED}Could not set dbox_PHP_SERVER. Aborting.${T_CNCOLOR}"
+      ;;
+  esac
+
+  # dbox_HTTPD_SERVER
+  case $magento_version in
+    "2.4.1"|"2.4.2")
+      dbox_HTTPD_SERVER="HTTPD_SERVER=apache-2.4" ;;
+    *)
+      ((_error_count++))
+      echo -e "${T_CRED}Could not set dbox_HTTPD_SERVER. Aborting.${T_CNCOLOR}"
+      ;;
+  esac
+
+  # dbox_MYSQL_SERVER
+  case $magento_version in
+    "2.4.1"|"2.4.2")
+      dbox_MYSQL_SERVER="MYSQL_SERVER=mysql-8.0" ;;
+    *)
+      ((_error_count++))
+      echo -e "${T_CRED}Could not set dbox_MYSQL_SERVER. Aborting.${T_CNCOLOR}"
+      ;;
+  esac
+
+  # dbox_REDIS_SERVER
+  case $magento_version in
+    "2.4.1"|"2.4.2")
+      dbox_REDIS_SERVER="REDIS_SERVER=5.0" ;;
+    *)
+      ((_error_count++))
+      echo -e "${T_CRED}Could not set dbox_REDIS_SERVER. Aborting.${T_CNCOLOR}"
+      ;;
+  esac
+
+  # php_version_for_ini="7.4"
+  case $magento_version in
+    "2.4.1"|"2.4.2")
+      php_version_for_ini="7.4" ;;
+    *)
+      ((_error_count++))
+      echo -e "${T_CRED}Could not set php_version_for_ini. Aborting.${T_CNCOLOR}"
+      ;;
+  esac
+
+  # magento_version_for_docker_compose_override="2.4"
+  case $magento_version in
+    "2.4.1"|"2.4.2")
+      magento_version_for_docker_compose_override="2.4" ;;
+    *)
+      ((_error_count++))
+      echo -e "${T_CRED}Could not set magento_version_for_docker_compose_override. Aborting.${T_CNCOLOR}"
+      ;;
+  esac
+
+  # magento_version_for_start_script
+  case $magento_version in
+    "2.4.1"|"2.4.2")
+      magento_version_for_start_script="2.4" ;;
+    *)
+      ((_error_count++))
+      echo -e "${T_CRED}Could not set magento_version_for_start_script. Aborting.${T_CNCOLOR}"
+      ;;
+  esac
+
+  if (( $_error_count > 0 )); then
+      echo -e "${T_CRED}There some errors setting .env variables. Fix them and retry.${T_CNCOLOR}"
+      exit 1
+  fi
+}
+
 while getopts "m:" opt
 do
     case "$opt" in
@@ -80,14 +160,15 @@ echo "02 ---> creating needing directories and config files...";
 
 create_new_env_file
 
-# TODO: main refactor. Instead of passing a magento version only as variable, we have to set all needed variables to configure it for that magento version and pass those variables
+set_env_variables_for_magento_version
+
 replaces_env
 
-enable_additional_containers $magento_version
+enable_additional_containers
 
-customize_php_ini $magento_version
+customize_php_ini
 
-create_start_dbox_script $magento_version
+create_start_dbox_script
 
 
 
